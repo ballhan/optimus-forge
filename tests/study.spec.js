@@ -9,8 +9,19 @@ test("robot, scrub, vehicle, reverse and display controls", async ({
   await page.goto(process.env.STUDY_URL || "http://127.0.0.1:5173");
   await expect(page.locator("canvas")).toBeVisible();
   await page.waitForFunction(() => window.primeStudy?.state.assemblies > 20);
+  expect(
+    await page.evaluate(() => window.primeStudy.state.connectedJoints),
+  ).toBeGreaterThan(30);
   await expect(page).toHaveTitle("Form Foundry — Optimus Prime");
   await page.screenshot({ path: "artifacts/robot.png" });
+  for (const value of [250, 750]) {
+    await page.locator("#transform").fill(String(value));
+    await page.waitForFunction(
+      (v) => window.primeStudy.state.progress === v / 1000,
+      value,
+    );
+    await page.screenshot({ path: `artifacts/stage-${value}.png` });
+  }
   await page.locator("#transform").fill("500");
   await expect(page.locator("#mode")).toHaveText("Transformation in progress");
   await page.waitForFunction(

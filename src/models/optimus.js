@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import { buildMovieRig } from "./movie-rig.js";
+import { connectTransformation } from "./transformation.js";
 import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
 import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
 import { TessellateModifier } from "three/addons/modifiers/TessellateModifier.js";
@@ -18,7 +19,7 @@ export function createOptimus() {
     const canvas = document.createElement("canvas");
     canvas.width = canvas.height = 512;
     const c = canvas.getContext("2d");
-    c.fillStyle = kind === "flames" ? "#131961" : "#999999";
+    c.fillStyle = kind === "flames" ? "#153c8a" : "#999999";
     c.fillRect(0, 0, 512, 512);
     if (kind === "flames") {
       // Hand-drawn flame tongues with a fine silver pinstripe over cobalt lacquer.
@@ -34,7 +35,7 @@ export function createOptimus() {
       path.bezierCurveTo(487, 416, 483, 322, 512, 290);
       path.lineTo(512, 512);
       path.closePath();
-      c.fillStyle = "#9c211a";
+      c.fillStyle = "#b52c21";
       c.fill(path);
       c.strokeStyle = "#96919c";
       c.lineWidth = 2.2;
@@ -134,26 +135,48 @@ export function createOptimus() {
     return t;
   }
   function paint(color, map = null) {
+    const canvas = document.createElement("canvas");
+    canvas.width = canvas.height = 512;
+    const c = canvas.getContext("2d");
+    c.fillStyle = "#b7b7b7";
+    c.fillRect(0, 0, 512, 512);
+    // Broad oily patches and rough dirt have different reflection widths.
+    for (let i = 0; i < 65; i++) {
+      const x = random() * 512,
+        y = random() * 512,
+        r = 10 + random() * 65;
+      const gradient = c.createRadialGradient(x, y, 0, x, y, r);
+      gradient.addColorStop(
+        0,
+        i % 3 ? "rgba(255,255,255,.55)" : "rgba(45,45,45,.4)",
+      );
+      gradient.addColorStop(1, "rgba(180,180,180,0)");
+      c.fillStyle = gradient;
+      c.fillRect(x - r, y - r, r * 2, r * 2);
+    }
+    const roughness = new THREE.CanvasTexture(canvas);
+    roughness.wrapS = roughness.wrapT = THREE.RepeatWrapping;
+    roughness.anisotropy = 4;
     return new THREE.MeshPhysicalMaterial({
       color: 0xffffff,
       map: map || paintedTexture(color),
-      metalness: 0.68,
-      roughness: 0.51,
-      roughnessMap: wear,
+      metalness: 0.48,
+      roughness: 0.69,
+      roughnessMap: roughness,
       bumpMap: wear,
-      bumpScale: 0.004,
-      clearcoat: 0.34,
-      clearcoatRoughness: 0.4,
+      bumpScale: 0.0015,
+      clearcoat: 0.3,
+      clearcoatRoughness: 0.38,
       envMapIntensity: 0.85,
     });
   }
   const m = {
-    blue: paint("#141a70"),
-    red: paint("#951c17"),
+    blue: paint("#163a83"),
+    red: paint("#ae2921"),
     flame: paint("#ffffff", flameMap),
     steel: metal("#60666f", 0.61),
     chrome: metal("#969da7", 0.43),
-    gunmetal: metal("#333c48", 0.48),
+    gunmetal: metal("#202730", 0.78),
     black: metal("#0e1219", 0.6),
     brass: metal("#857356", 0.4),
     rubber: new THREE.MeshStandardMaterial({
@@ -421,12 +444,27 @@ export function createOptimus() {
   buildMovieRig({ mesh, box, cyl, rod, plate, joint, vents, wheel, rig, m });
 
   // Bake local static geometry per assembly/material, preserving all rig pivots.
-  for (const { g } of parts) {
+  for (const { g, b, qb } of parts) {
     g.updateMatrixWorld(true);
     const batches = new Map();
     g.traverse((o) => {
       if (!o.isMesh) return;
       const geo = o.geometry.clone().applyMatrix4(o.matrixWorld);
+      // One vehicle-space flame field crosses separately articulated body panels.
+      if (o.material === m.flame) {
+        const point = new THREE.Vector3();
+        const positions = geo.attributes.position;
+        const uv = geo.attributes.uv;
+        for (let i = 0; i < positions.count; i++) {
+          point.fromBufferAttribute(positions, i).applyQuaternion(qb).add(b);
+          // Keep a consistent projection across the curved surface, avoiding
+          // abrupt UV seams where adjacent triangle normals change direction.
+          const vertical = g.name.includes("hood top")
+            ? point.x + 0.9
+            : point.y;
+          uv.setXY(i, point.z / 2.7 + 0.5, vertical / 2.7);
+        }
+      }
       const key = o.material.uuid;
       if (!batches.has(key))
         batches.set(key, { material: o.material, geometries: [] });
@@ -439,32 +477,8 @@ export function createOptimus() {
       for (const old of geometries) old.dispose();
     }
   }
-  const hingeRotation = new THREE.Quaternion(),
-    hingeAxis = new THREE.Vector3();
-  function pose(t) {
-    for (const p of parts) {
-      const v = THREE.MathUtils.smoothstep(t, p.start, p.end);
-      p.g.position
-        .lerpVectors(p.a, p.b, v)
-        .addScaledVector(p.arc, Math.sin(v * Math.PI));
-      p.g.quaternion.slerpQuaternions(p.qa, p.qb, v);
-      const side = p.g.name.includes("-1") ? -1 : 1;
-      if (/door|shoulder|hood|roof/.test(p.g.name)) {
-        // Release the skin's hinge before the assembly folds into the vehicle.
-        const opening = Math.sin(
-          Math.PI * THREE.MathUtils.smoothstep(v, 0, 0.85),
-        );
-        hingeAxis.set(0, 1, 0);
-        hingeRotation.setFromAxisAngle(hingeAxis, side * opening * 0.34);
-        p.g.quaternion.multiply(hingeRotation);
-      }
-      if (p.g.name.includes("tire")) {
-        hingeAxis.set(1, 0, 0);
-        hingeRotation.setFromAxisAngle(hingeAxis, v * Math.PI * 2);
-        p.g.quaternion.multiply(hingeRotation);
-      }
-    }
-  }
+  const connected = connectTransformation(root, parts, m.steel);
+  const pose = connected.pose;
   pose(0);
   return {
     root,
@@ -476,6 +490,8 @@ export function createOptimus() {
       edition: "2007–2011 / Movie study",
       vehicle: "Peterbilt 379",
       id: "optimus-prime",
+      connectedJoints: connected.jointCount,
+      actuators: connected.linkCount,
     },
   };
 }

@@ -170,7 +170,7 @@ function updateUI() {
         : [
             "Releasing armor locks.",
             "Folding the assemblies.",
-            "Bringing it together.",
+            "Compressing the chassis.",
             "Locking vehicle form.",
           ][stage];
   document.querySelector("#mode").textContent =
@@ -286,7 +286,7 @@ function animate(now) {
   const dt = Math.min((now - last) / 1000, 0.1);
   last = now;
   if (playing) {
-    target = THREE.MathUtils.clamp(target + (dt / 10) * direction, 0, 1);
+    target = THREE.MathUtils.clamp(target + (dt / 12) * direction, 0, 1);
     if (target === 0 || target === 1) playing = false;
     updateUI();
   }
@@ -321,6 +321,8 @@ window.primeStudy = {
       renderedFrames,
       cameraMoving,
       assemblies: parts.length,
+      connectedJoints: model.metadata.connectedJoints,
+      actuators: model.metadata.actuators,
       cinema,
       model: model.metadata.id,
     };
