@@ -4,13 +4,16 @@ An interactive 3D model collection. The first study is an original procedural in
 
 **Live:** https://ballhan.github.io/form-foundry/
 
-- 45 independently animated assemblies with staged folding and clearance arcs.
-- Split windshield chest, flame-painted armor, exposed spine and hydraulics, finger geometry, rebuilt helmet, fuel tanks, exhaust stacks, and six wheels.
+- Independently animated assemblies with staged hinge releases, folding, wheel rotation, and clearance arcs. Auto-play takes ten seconds and is reversible.
+- Reference-based proportions: compact tilted windshield chest, swept shoulder shells, V-shaped mechanical abdomen, fuller forearms, segmented fists, layered leg armor, and tapered battle-mask geometry.
+- Tires are distributed around the hips, backs of the knees, and ankles in robot mode. Separate body panels close around the long-nose truck's hood.
 - Clear-coated cobalt and crimson paint, silver flame pinstripes, brushed-metal maps, chrome, rubber, glass, and illuminated optics.
 - Environment reflections, rim lighting, contact shadows, ambient occlusion, and restrained bloom.
-- Geometry batched per material within each assembly. Rendering stops while idle; ambient occlusion uses reduced resolution. The cinema-shading button toggles postprocessing for a lighter rendering mode.
+- Geometry is batched per material within each assembly, with simpler geometry for tiny mechanical details. Rendering stops while idle. Ambient occlusion and bloom return after scrubbing or orbiting settles; the cinema-shading button can disable them entirely. Edge smoothing stays enabled during motion.
 
-The model factory is in `src/models/optimus.js`. The viewer, camera, lighting, and controls are in `src/main.js`. Future models can supply their own root group, normalized `pose(t)` function, and metadata.
+The model factory and materials are in `src/models/optimus.js`; the reference-based assembly layout is in `src/models/movie-rig.js`; curved armor, gears, pistons, cables, and hands are built in `src/models/movie-detail.js`. The viewer, camera, lighting, and controls are in `src/main.js`. Future models can supply their own root group, normalized `pose(t)` function, and metadata.
+
+Use the crosshair button to inspect the upper body (or the truck at close range). Reset returns to the full figure. Starting a transformation also restores full-figure framing.
 
 ## Run
 
@@ -31,7 +34,7 @@ npx playwright install chromium
 npm test
 ```
 
-The browser test checks robot and truck states, intermediate scrubbing, pause and reverse playback, camera and shading controls, keyboard access, runtime errors, and mobile overflow. Screenshots go into the ignored `artifacts/` directory. Set `STUDY_URL` to verify a deployed build.
+The browser tests check robot and truck states, intermediate scrubbing, pause and reverse playback, camera and shading controls, inspection-view reset, keyboard access, runtime errors, and mobile overflow. Front, rear, upper-body, intermediate, vehicle, and mobile screenshots go into the ignored `artifacts/` directory. Set `STUDY_URL` to verify a deployed build. Run tests with `--workers=1` when testing on a shared GPU.
 
 ## Publish
 
@@ -44,6 +47,9 @@ This is a movie-inspired fan interpretation, not a screen-exact studio asset or 
 ## Design references
 
 - [2007 film reference image, IMDb](https://www.imdb.com/media/rm222269184/tt0418279) — proportions, armor, and paint placement; consulted locally only.
+- [Front-view movie concept art](https://assets.hongkiat.com/uploads/transformers-the-movie-artworks/optimus-prime.jpg) — chest, waist, shoulders, leg layers, and split toes.
+- [Back-view concept art by Ben Procter](https://www.benprocter.com/overview/robots-characters-props-vehicles-graphics/8129344) — diagonal back assemblies and wheel locations; [reference image](https://assets.hongkiat.com/uploads/transformers-the-movie-artworks/optimus-prime-back-view.jpg).
+- [Film face close-up](https://miro.medium.com/v2/resize:fit:1400/1*FPCyyaz2USv7mhykZijFvA.jpeg) — brow, eye recesses, cheek structures, and surface finish.
 - [Licensed Optimus Prime model brochure](https://myoptimusprime.com/wp-content/uploads/sites/31/2023/07/optimus-prime-boost.pdf) — original-film design reference.
 - [Three.js physical material documentation](https://threejs.org/docs/pages/MeshPhysicalMaterial.html) — clearcoat and surface shading.
 
