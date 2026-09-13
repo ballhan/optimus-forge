@@ -1,7 +1,7 @@
 {
-  "name": "optimus-forge",
+  "name": "form-foundry",
   "version": "1.0.0",
-  "description": "Interactive Optimus Prime 3D transformation study",
+  "description": "An interactive 3D model collection, featuring a movie-inspired Optimus Prime transformation",
   "scripts": {
     "test": "playwright test",
     "dev": "vite",

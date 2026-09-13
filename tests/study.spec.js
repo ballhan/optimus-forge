@@ -1,10 +1,12 @@
 import {test,expect} from '@playwright/test';
 test('robot, scrub, vehicle, reverse and display controls',async({page})=>{
+ test.setTimeout(120000);
  const errors=[];page.on('pageerror',e=>errors.push(e.message));
  await page.setViewportSize({width:1440,height:1000});
- await page.goto('http://127.0.0.1:5173');
+ await page.goto(process.env.STUDY_URL || 'http://127.0.0.1:5173');
  await expect(page.locator('canvas')).toBeVisible();
  await page.waitForFunction(()=>window.primeStudy?.state.assemblies>20);
+ await expect(page).toHaveTitle('Form Foundry — Optimus Prime');
  await page.screenshot({path:'artifacts/robot.png'});
  await page.locator('#transform').fill('500');
  await expect(page.locator('#mode')).toHaveText('Transformation in progress');
@@ -21,9 +23,18 @@ test('robot, scrub, vehicle, reverse and display controls',async({page})=>{
  await page.locator('#wire').click();await expect(page.locator('#wire')).toHaveAttribute('aria-pressed','true');
  await page.locator('#wire').click();await page.locator('#rotate').click();await expect(page.locator('#rotate')).toHaveAttribute('aria-pressed','true');
  await page.locator('#reset').click();await expect(page.locator('#rotate')).toHaveAttribute('aria-pressed','false');
+ await page.locator('#lighting').click();await expect(page.locator('#lighting')).toHaveAttribute('aria-pressed','false');
+ expect(await page.evaluate(()=>window.primeStudy.state.cinema)).toBe(false);
+ await page.locator('#lighting').click();
  await page.locator('#transform').fill('0');await page.waitForFunction(()=>window.primeStudy.state.progress===0);
  await page.setViewportSize({width:390,height:844});
  await page.screenshot({path:'artifacts/mobile.png',fullPage:true});
+ await page.locator('#transform').focus();await page.keyboard.press('End');
+ await page.waitForFunction(()=>window.primeStudy.state.progress===1);
+ await page.screenshot({path:'artifacts/mobile-truck.png',fullPage:true});
+ await page.locator('#play').click();
+ await page.waitForFunction(()=>window.primeStudy.state.target===0,{},{timeout:45000});
+ await expect(page.locator('#mode')).toHaveText('Robot mode');
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
  expect(errors).toEqual([]);
 });
