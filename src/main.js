@@ -6,6 +6,8 @@ import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { SSAOPass } from 'three/addons/postprocessing/SSAOPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
+import { FXAAShader } from 'three/addons/shaders/FXAAShader.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import './style.css';
 
@@ -42,11 +44,11 @@ const mat=(color,metalness=.65,roughness=.3)=>new THREE.MeshStandardMaterial({co
 const steel=mat('#738398',.9,.3);
 function box(parent,size,pos,material){const m=new THREE.Mesh(new THREE.BoxGeometry(...size),material);m.position.set(...pos);parent.add(m);return m;}
 const composer=new EffectComposer(renderer);
-composer.renderTarget1.samples=composer.renderTarget2.samples=Math.min(4,renderer.capabilities.maxSamples);
 composer.addPass(new RenderPass(scene,camera));
 const occlusion=new SSAOPass(scene,camera,1,1,12);occlusion.kernelRadius=.22;occlusion.minDistance=.003;occlusion.maxDistance=.16;composer.addPass(occlusion);
 const bloom=new UnrealBloomPass(new THREE.Vector2(1,1),.075,.25,4.0);composer.addPass(bloom);
 composer.addPass(new OutputPass());
+const antialias=new ShaderPass(FXAAShader);composer.addPass(antialias);
 let cinema=true;
 document.querySelector('#lighting').addEventListener('click',e=>{cinema=!cinema;dirty=true;occlusion.enabled=bloom.enabled=cinema;e.currentTarget.setAttribute('aria-pressed',cinema);e.currentTarget.title=cinema?'Cinema shading enabled — switch to performance mode':'Performance mode — enable cinema shading';});
 const floor=new THREE.Mesh(new THREE.CircleGeometry(18,96),new THREE.ShadowMaterial({opacity:.22}));floor.rotation.x=-Math.PI/2;floor.position.y=-.013;floor.receiveShadow=true;scene.add(floor);
@@ -65,7 +67,7 @@ document.querySelector('#rotate').addEventListener('click',e=>{controls.autoRota
 document.querySelector('#wire').addEventListener('click',e=>{dirty=true;const on=e.currentTarget.getAttribute('aria-pressed')!=='true';root.traverse(o=>{if(o.isMesh)o.material.wireframe=on;});e.currentTarget.setAttribute('aria-pressed',on);});
 function reset(){const mobile=innerWidth<800;camera.position.set(mobile?8.4:8.4, mobile?5.2:5.7,mobile?14.7:15.1);controls.target.set(0,2.6,0);controls.update();}
 document.querySelector('#reset').addEventListener('click',()=>{controls.autoRotate=false;document.querySelector('#rotate').setAttribute('aria-pressed','false');reset();});
-function resize(){const w=viewport.clientWidth,h=viewport.clientHeight;renderer.setSize(w,h);composer.setSize(w,h);occlusion.setSize(Math.ceil(w*renderer.getPixelRatio()*.6),Math.ceil(h*renderer.getPixelRatio()*.6));dirty=true;camera.aspect=w/h;camera.clearViewOffset();if(w>800)camera.setViewOffset(w,h,-w*.135,h*.10,w,h);else camera.setViewOffset(w,h,-w*.025,h*.01,w,h);camera.updateProjectionMatrix();}new ResizeObserver(resize).observe(viewport);reset();resize();updateUI();pose(0);document.querySelector('#loading').remove();
+function resize(){const w=viewport.clientWidth,h=viewport.clientHeight,dpr=renderer.getPixelRatio();renderer.setSize(w,h);composer.setSize(w,h);antialias.uniforms.resolution.value.set(1/(w*dpr),1/(h*dpr));occlusion.setSize(Math.ceil(w*dpr*.6),Math.ceil(h*dpr*.6));dirty=true;camera.aspect=w/h;camera.clearViewOffset();if(w>800)camera.setViewOffset(w,h,-w*.135,h*.10,w,h);else camera.setViewOffset(w,h,-w*.025,h*.01,w,h);camera.updateProjectionMatrix();}new ResizeObserver(resize).observe(viewport);reset();resize();updateUI();pose(0);document.querySelector('#loading').remove();
 renderer.domElement.addEventListener('webglcontextlost',e=>{e.preventDefault();playing=false;const note=document.createElement('div');note.id='loading';note.textContent='Graphics context interrupted. Reload to resume.';viewport.appendChild(note);});
 let renderedFrames=0;
 function animate(now){
