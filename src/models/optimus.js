@@ -2,6 +2,7 @@ import * as THREE from "three";
 import { buildMovieRig } from "./movie-rig.js";
 import { connectTransformation } from "./transformation.js";
 import { precisionDetail } from "./precision-detail.js";
+import { innerArmor } from "./inner-armor.js";
 import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
 import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
 import { TessellateModifier } from "three/addons/modifiers/TessellateModifier.js";
@@ -172,11 +173,11 @@ export function createOptimus() {
     });
   }
   const m = {
-    blue: paint("#163a83"),
-    red: paint("#ae2921"),
+    blue: paint("#153373"),
+    red: paint("#94231b"),
     flame: paint("#ffffff", flameMap),
-    steel: metal("#60666f", 0.61),
-    chrome: metal("#969da7", 0.43),
+    steel: metal("#555c65", 0.72),
+    chrome: metal("#969da7", 0.57),
     gunmetal: metal("#202730", 0.78),
     black: metal("#0e1219", 0.6),
     brass: metal("#857356", 0.4),
@@ -443,6 +444,14 @@ export function createOptimus() {
   }
 
   buildMovieRig({ mesh, box, cyl, rod, plate, joint, vents, wheel, rig, m });
+  innerArmor({ mesh, box, cyl, rod, plate, m }, parts);
+  // Compact helmet proportions and reduce the long exposed neck.
+  const helmet = parts.find((p) => p.g.name === "segmented movie helmet");
+  for (const child of helmet.g.children) {
+    child.position.multiply(new THREE.Vector3(1.04, 0.84, 1));
+    child.scale.multiply(new THREE.Vector3(1.04, 0.84, 1));
+  }
+  helmet.a.y -= 0.1;
   precisionDetail({ mesh, box, cyl, rod, plate, m }, parts);
 
   // Bake local static geometry per assembly/material, preserving all rig pivots.

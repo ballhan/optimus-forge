@@ -355,7 +355,7 @@ export function buildMovieRig(k) {
 
     const shoulder = rig(
       `swept shoulder hood ${s}`,
-      [s * 1.4, 4.76, -0.035],
+      [s * 1.29, 4.76, -0.035],
       [s * 0.785, 1.32, 1.78],
       0.12,
       0.83,
@@ -461,7 +461,7 @@ export function buildMovieRig(k) {
     );
     const arm = rig(
       `brachial actuator ${s}`,
-      [s * 1.48, 4.03, 0.01],
+      [s * 1.34, 4.03, 0.01],
       [s * 0.55, 1.61, -0.59],
       0.11,
       0.68,
@@ -501,7 +501,7 @@ export function buildMovieRig(k) {
 
     const forearm = rig(
       `layered forearm ${s}`,
-      [s * 1.67, 3.37, 0.12],
+      [s * 1.51, 3.37, 0.12],
       [s * 0.75, 1.27, 0.08],
       0.17,
       0.74,
@@ -555,7 +555,7 @@ export function buildMovieRig(k) {
       );
     const hand = rig(
       `segmented fist ${s}`,
-      [s * 1.73, 2.73, 0.2],
+      [s * 1.57, 2.73, 0.2],
       [s * 0.53, 1.27, -0.32],
       0.02,
       0.43,

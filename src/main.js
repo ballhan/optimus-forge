@@ -28,16 +28,16 @@ try {
 }
 renderer.setPixelRatio(Math.min(devicePixelRatio, 1.5));
 renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFShadowMap;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.1;
+renderer.toneMappingExposure = 1.0;
 viewport.appendChild(renderer.domElement);
 const pmrem = new THREE.PMREMGenerator(renderer);
 const room = new RoomEnvironment();
 scene.environment = pmrem.fromScene(room, 0.04).texture;
 room.dispose();
 pmrem.dispose();
-scene.environmentIntensity = 0.65;
+scene.environmentIntensity = 0.52;
 let dirty = true;
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.addEventListener("change", () => {
@@ -58,7 +58,7 @@ function light(color, intensity, pos) {
   scene.add(l);
   return l;
 }
-const key = light(0xffead6, 2.5, [4, 8, 5]);
+const key = light(0xfff2e3, 3.0, [4, 8, 5]);
 key.castShadow = true;
 key.shadow.mapSize.set(2048, 2048);
 Object.assign(key.shadow.camera, {
@@ -71,8 +71,8 @@ Object.assign(key.shadow.camera, {
 });
 key.shadow.normalBias = 0.025;
 light(0xb2cfff, 1.65, [-4, 6, -4]);
-light(0xffffff, 1.1, [-4, 3, 5]);
-light(0xff5b35, 1.0, [4, 3, -3]);
+light(0xdde8f2, 0.7, [-4, 3, 5]);
+light(0xffb187, 0.35, [4, 3, -3]);
 const model = createOptimus();
 const { root, parts } = model;
 scene.add(root);
@@ -152,6 +152,11 @@ let progress = 0,
 const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
 function pose(t) {
   model.pose(t);
+  if (!detail) {
+    const height = 2.9 - 1.35 * THREE.MathUtils.smoothstep(t, 0.4, 1);
+    camera.position.y += height - controls.target.y;
+    controls.target.y = height;
+  }
 }
 function updateUI() {
   const percent = Math.round(target * 100);
@@ -219,12 +224,13 @@ function reset() {
   detail = false;
   document.querySelector("#detail").setAttribute("aria-pressed", "false");
   const mobile = innerWidth < 800;
+  const framingDrop = 1.35 * THREE.MathUtils.smoothstep(progress, 0.4, 1);
   camera.position.set(
     mobile ? 5.1 : 5.5,
-    mobile ? 4.8 : 5.2,
+    (mobile ? 4.8 : 5.2) - framingDrop,
     mobile ? 11.8 : 13.3,
   );
-  controls.target.set(0, 2.9, 0);
+  controls.target.set(0, 2.9 - framingDrop, 0);
   controls.update();
 }
 document.querySelector("#detail").addEventListener("click", () => {
