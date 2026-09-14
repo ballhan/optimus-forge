@@ -220,11 +220,11 @@ function reset() {
   document.querySelector("#detail").setAttribute("aria-pressed", "false");
   const mobile = innerWidth < 800;
   camera.position.set(
-    mobile ? 6.7 : 6.7,
-    mobile ? 5.2 : 5.8,
-    mobile ? 15.3 : 15.6,
+    mobile ? 5.1 : 5.5,
+    mobile ? 4.8 : 5.2,
+    mobile ? 11.8 : 13.3,
   );
-  controls.target.set(0, 2.6, 0);
+  controls.target.set(0, 2.9, 0);
   controls.update();
 }
 document.querySelector("#detail").addEventListener("click", () => {

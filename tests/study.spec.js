@@ -14,7 +14,7 @@ test("robot, scrub, vehicle, reverse and display controls", async ({
   ).toBeGreaterThan(30);
   await expect(page).toHaveTitle("Form Foundry — Optimus Prime");
   await page.screenshot({ path: "artifacts/robot.png" });
-  for (const value of [250, 750]) {
+  for (const value of [100, 250, 400, 600, 750, 900]) {
     await page.locator("#transform").fill(String(value));
     await page.waitForFunction(
       (v) => window.primeStudy.state.progress === v / 1000,

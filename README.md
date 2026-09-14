@@ -9,6 +9,8 @@ An interactive 3D model collection. The first study is an original procedural in
 - Tires are distributed around the hips, backs of the knees, and ankles in robot mode. Separate body panels close around the long-nose truck's hood.
 - Clear-coated cobalt and crimson paint, silver flame pinstripes, brushed-metal maps, chrome, rubber, glass, and illuminated optics.
 - Shared vehicle-space flame mapping across moving panels, varied paint roughness, darker machinery, tapered chest stampings, and swept shoulder armor.
+- Closer default framing, surface-seated fasteners, window hardware, ventilation grilles, cable looms, shin rails, exhaust shields, and truck fittings. These details are generated in `src/models/precision-detail.js` and batched with their assemblies.
+- Authored clearance corridors spread the arms and back panels before folding, lift hood panels during closure, and route the grille and bumper around the torso. This reduces visible intersections; it is not a collision solver.
 - Environment reflections, rim lighting, contact shadows, ambient occlusion, and restrained bloom.
 - Geometry is batched per material within each assembly, with simpler geometry for tiny mechanical details. Rendering stops while idle. Ambient occlusion and bloom return after scrubbing or orbiting settles; the cinema-shading button can disable them entirely. Edge smoothing stays enabled during motion.
 

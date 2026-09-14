@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import { buildMovieRig } from "./movie-rig.js";
 import { connectTransformation } from "./transformation.js";
+import { precisionDetail } from "./precision-detail.js";
 import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
 import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
 import { TessellateModifier } from "three/addons/modifiers/TessellateModifier.js";
@@ -442,6 +443,7 @@ export function createOptimus() {
   }
 
   buildMovieRig({ mesh, box, cyl, rod, plate, joint, vents, wheel, rig, m });
+  precisionDetail({ mesh, box, cyl, rod, plate, m }, parts);
 
   // Bake local static geometry per assembly/material, preserving all rig pivots.
   for (const { g, b, qb } of parts) {

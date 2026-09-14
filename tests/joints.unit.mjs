@@ -13,6 +13,8 @@ test("nested joint conversion preserves geometry endpoints and scrubs determinis
     "layered forearm 1",
     "segmented fist 1",
     "radiator",
+    "hip tire 1",
+    "abdominal headlight pod 1",
   ];
   const parts = names.map((name, i) => {
     const g = new THREE.Group();
@@ -39,7 +41,12 @@ test("nested joint conversion preserves geometry endpoints and scrubs determinis
     qb: p.qb.clone(),
   }));
   const rig = connectTransformation(root, parts, material);
-  assert.equal(rig.jointCount, 5);
+  assert.equal(rig.jointCount, 7);
+  assert.equal(
+    parts.find((p) => p.g.name === "abdominal headlight pod 1").parent.g.name,
+    "hip tire 1",
+    "headlights must follow the front axle, not helmet retraction",
+  );
   for (const t of [0, 1]) {
     rig.pose(t);
     root.updateMatrixWorld(true);

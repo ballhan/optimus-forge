@@ -50,7 +50,7 @@ export function connectTransformation(root, parts, material) {
     -0.15,
   );
   for (const p of parts)
-    if (/head|helmet/.test(p.g.name))
+    if (/helmet/.test(p.g.name))
       bind(p.g.name, "vertebral frame", [0, -0.25, 0], 0.03, 0.3, -0.45);
   for (const s of [-1, 1]) {
     bind(
@@ -222,11 +222,62 @@ export function connectTransformation(root, parts, material) {
   const rotation = new THREE.Quaternion();
   const bendAxis = new THREE.Vector3(1, 0, 0);
   const ease = (x) => x * x * x * (x * (x * 6 - 15) + 10);
+  const ramp = (t, a, b) =>
+    ease(THREE.MathUtils.clamp((t - a) / (b - a), 0, 1));
+  const corridor = (t, a, b, c, d) => ramp(t, a, b) * (1 - ramp(t, c, d));
+  // Open clearance corridors before the heavy assemblies move. These offsets
+  // are in joint-local space, so descendants and their actuators stay attached.
+  for (const p of parts) {
+    const s = p.g.name.includes(" -1") ? -1 : 1;
+    const name = p.g.name;
+    if (/brachial actuator/.test(name))
+      p.clearance = {
+        offset: v([s * 0.62, 0.08, -0.25]),
+        range: [0.02, 0.16, 0.55, 0.78],
+      };
+    if (/diagonal sleeper/.test(name))
+      p.clearance = {
+        offset: v([s * 0.65, 0.12, -0.45]),
+        range: [0, 0.17, 0.74, 0.94],
+      };
+    if (/windshield pectoral/.test(name))
+      p.clearance = {
+        offset: v([s * 0.27, 0.12, 0.42]),
+        range: [0, 0.15, 0.59, 0.84],
+      };
+    if (/helmet/.test(name))
+      p.clearance = { offset: v([0, 0.18, -0.72]), range: [0, 0.1, 0.3, 0.52] };
+    if (/swept shoulder/.test(name))
+      p.clearance = {
+        offset: v([s * 0.48, 0.28, 0.4]),
+        range: [0.35, 0.53, 0.83, 0.96],
+      };
+    if (/hood top skin/.test(name))
+      p.clearance = {
+        offset: v([0, 0.6, 0]),
+        range: [0.47, 0.64, 0.91, 0.995],
+      };
+    if (/sculpted thigh/.test(name))
+      p.clearance = {
+        offset: v([s * 0.24, 0.05, 0]),
+        range: [0.16, 0.31, 0.65, 0.86],
+      };
+    if (/radiator|bumper/.test(name))
+      p.clearance = {
+        offset: v([name === "radiator" ? -1.55 : 1.45, 0.18, -0.55]),
+        range: [0.08, 0.25, 0.75, 0.95],
+      };
+  }
   function pose(t) {
     for (const p of parts) {
       const u = THREE.MathUtils.clamp((t - p.start) / (p.end - p.start), 0, 1),
         f = ease(u);
       p.g.position.lerpVectors(p.a, p.b, f);
+      if (p.clearance)
+        p.g.position.addScaledVector(
+          p.clearance.offset,
+          corridor(t, ...p.clearance.range),
+        );
       if (!p.parent) p.g.position.addScaledVector(p.arc, Math.sin(Math.PI * f));
       p.g.quaternion.slerpQuaternions(p.qa, p.qb, f);
       if (p.bend) {
