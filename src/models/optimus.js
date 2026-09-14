@@ -3,6 +3,7 @@ import { buildMovieRig } from "./movie-rig.js";
 import { connectTransformation } from "./transformation.js";
 import { precisionDetail } from "./precision-detail.js";
 import { innerArmor } from "./inner-armor.js";
+import { buildMechanisms } from "./mechanisms.js";
 import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
 import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
 import { TessellateModifier } from "three/addons/modifiers/TessellateModifier.js";
@@ -489,6 +490,7 @@ export function createOptimus() {
     }
   }
   const connected = connectTransformation(root, parts, m.steel);
+  const mechanisms = buildMechanisms({ mesh, box, cyl, rod, plate, m }, parts);
   const pose = connected.pose;
   pose(0);
   return {
@@ -496,6 +498,7 @@ export function createOptimus() {
     parts,
     materials,
     pose,
+    mechanisms,
     metadata: {
       name: "Optimus Prime",
       edition: "2007–2011 / Movie study",

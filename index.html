@@ -67,6 +67,29 @@
             ◇
           </button>
         </aside>
+        <section class="mechanism-controls" aria-label="Mechanical systems">
+          <div class="mechanism-title">MECHANICAL SYSTEMS <span>02</span></div>
+          <button id="systems" aria-pressed="false">Run systems</button>
+          <label for="armor">Armor <span>Open the outer panels</span></label>
+          <input
+            id="armor"
+            type="range"
+            min="0"
+            max="100"
+            value="0"
+            aria-label="Armor opening"
+          />
+          <label for="grip">Grip <span>Articulated fingers</span></label>
+          <input
+            id="grip"
+            type="range"
+            min="0"
+            max="100"
+            value="30"
+            aria-label="Finger grip"
+          />
+          <p>Open armor to reveal the moving mechanisms.</p>
+        </section>
         <div class="model-caption">
           <span class="status-dot"></span><span id="mode">Robot mode</span
           ><span class="drag-hint">Drag to orbit · Scroll to zoom</span>

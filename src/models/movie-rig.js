@@ -562,7 +562,7 @@ export function buildMovieRig(k) {
       [rad, 0, 0],
       [0.08, 0, -s * 0.1],
     );
-    servoHand(hand, s);
+    // Articulated palm and finger chains are installed after static batching.
 
     const thigh = rig(
       `sculpted thigh ${s}`,

@@ -11,6 +11,7 @@ export function connectTransformation(root, parts, material) {
       parent = byName.get(parentName);
     if (!p) return;
     const offset = v(pivot);
+    p.pivot = offset.clone();
     for (const mesh of p.g.children)
       if (mesh.isMesh) mesh.geometry.translate(-offset.x, -offset.y, -offset.z);
     p.a.add(offset.clone().applyQuaternion(p.qa));

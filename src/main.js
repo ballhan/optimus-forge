@@ -144,6 +144,25 @@ for (let i = 0; i < 60; i++) {
 const slider = document.querySelector("#transform"),
   play = document.querySelector("#play");
 let detail = false;
+let systemsRunning = false,
+  armor = 0,
+  grip = 0.3;
+const armorControl = document.querySelector("#armor"),
+  gripControl = document.querySelector("#grip");
+document.querySelector("#systems").addEventListener("click", (e) => {
+  systemsRunning = !systemsRunning;
+  e.currentTarget.setAttribute("aria-pressed", systemsRunning);
+  e.currentTarget.textContent = systemsRunning
+    ? "Pause systems"
+    : "Run systems";
+  dirty = true;
+});
+armorControl.addEventListener("input", () => {
+  dirty = true;
+});
+gripControl.addEventListener("input", () => {
+  dirty = true;
+});
 let progress = 0,
   target = 0,
   playing = false,
@@ -152,6 +171,13 @@ let progress = 0,
 const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
 function pose(t) {
   model.pose(t);
+  model.mechanisms.pose(
+    t,
+    performance.now() / 1000,
+    armor,
+    grip,
+    systemsRunning,
+  );
   if (!detail) {
     const height = 2.9 - 1.35 * THREE.MathUtils.smoothstep(t, 0.4, 1);
     camera.position.y += height - controls.target.y;
@@ -303,8 +329,27 @@ function animate(now) {
     pose(progress);
     dirty = true;
   }
+  const oldArmor = armor,
+    oldGrip = grip;
+  armor = THREE.MathUtils.damp(armor, Number(armorControl.value) / 100, 10, dt);
+  grip = THREE.MathUtils.damp(grip, Number(gripControl.value) / 100, 10, dt);
+  if (Math.abs(armor - Number(armorControl.value) / 100) < 0.0001)
+    armor = Number(armorControl.value) / 100;
+  if (Math.abs(grip - Number(gripControl.value) / 100) < 0.0001)
+    grip = Number(gripControl.value) / 100;
+  const mechanismsMoving =
+    systemsRunning || armor !== oldArmor || grip !== oldGrip;
+  if (mechanismsMoving) {
+    model.mechanisms.pose(progress, now / 1000, armor, grip, systemsRunning);
+    dirty = true;
+  }
   cameraMoving = controls.update();
-  const settled = cinema && !playing && progress === target && !cameraMoving;
+  const settled =
+    cinema &&
+    !playing &&
+    progress === target &&
+    !cameraMoving &&
+    !mechanismsMoving;
   if (occlusion.enabled !== settled) {
     occlusion.enabled = bloom.enabled = settled;
     dirty = true;
@@ -331,6 +376,13 @@ window.primeStudy = {
       actuators: model.metadata.actuators,
       cinema,
       model: model.metadata.id,
+      systemsRunning,
+      armor,
+      grip,
+      mechanismComponents: model.mechanisms.components,
+      armorHinges: model.mechanisms.hinges,
+      fingerJoints: model.mechanisms.fingerJoints,
+      rotorPhase: model.mechanisms.phase,
     };
   },
 };

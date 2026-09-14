@@ -4,6 +4,12 @@ An interactive 3D model collection. The first study is an original procedural in
 
 **Live:** https://ballhan.github.io/form-foundry/
 
+### Mechanical inspection
+
+Use **Armor** to open fourteen hinged covers across the shoulders, forearms, thighs, and calves. **Grip** controls thirty finger joints. **Run systems** animates the turbine rotors, finger flex, and illuminated core; pause holds the rotors in place. Pistons extend with the armor hinges. The covers close automatically as the transformation begins. These original inspection mechanisms are an artistic addition rather than an exact reproduction of the movie rig.
+
+`src/models/mechanisms.js` builds the moving subassemblies after static batching. Geometry is merged within each finger segment, rotor, and armor flap so the extra detail retains independent motion. The mechanism controls have a responsive mobile layout.
+
 - Parented arm, leg, and cab chains with offset hinge pivots and telescoping actuator connections. Hands and feet fold first, the chassis compresses, then outer panels close. Auto-play takes twelve seconds and is reversible.
 - Reference-based proportions: compact tilted windshield chest, swept shoulder shells, V-shaped mechanical abdomen, fuller forearms, segmented fists, layered leg armor, and tapered battle-mask geometry.
 - Tires are distributed around the hips, backs of the knees, and ankles in robot mode. Separate body panels close around the long-nose truck's hood.
