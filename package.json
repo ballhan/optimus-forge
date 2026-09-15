@@ -1,9 +1,10 @@
 {
   "name": "form-foundry",
   "version": "1.0.0",
-  "description": "An interactive 3D model collection, featuring a movie-inspired Optimus Prime transformation",
+  "description": "An interactive 3D model collection of movie-inspired procedural transformations",
   "scripts": {
     "test": "playwright test",
+    "test:unit": "node --test tests/joints.unit.mjs tests/bee-joints.unit.mjs",
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview"

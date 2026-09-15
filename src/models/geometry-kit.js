@@ -164,7 +164,14 @@ export function createGeometryKit({ root, parts, materials, seed = 72007 }) {
     materials.add(material);
     return o;
   }
-  function box(g, size, pos, material = m.steel, rot = [0, 0, 0], radius = 0.025) {
+  function box(
+    g,
+    size,
+    pos,
+    material = m.steel,
+    rot = [0, 0, 0],
+    radius = 0.025,
+  ) {
     const key = `b${size}/${radius}`;
     if (!cache.has(key))
       cache.set(
@@ -177,7 +184,8 @@ export function createGeometryKit({ root, parts, materials, seed = 72007 }) {
   }
   function cyl(g, r, h, pos, material = m.steel, axis = "y", r2 = r, n = 20) {
     const key = `c${r}/${h}/${r2}/${n}`;
-    if (!cache.has(key)) cache.set(key, new THREE.CylinderGeometry(r, r2, h, n));
+    if (!cache.has(key))
+      cache.set(key, new THREE.CylinderGeometry(r, r2, h, n));
     return mesh(
       g,
       cache.get(key),
@@ -297,22 +305,6 @@ export function createGeometryKit({ root, parts, materials, seed = 72007 }) {
     cyl(g, r * 0.42, 0.205, pos, m.black, axis);
     cyl(g, r * 0.17, 0.23, pos, m.brass, axis);
   }
-  function ribbed(g, a, b, r = 0.08) {
-    rod(g, a, b, r, m.gunmetal);
-    const av = new THREE.Vector3(...a),
-      bv = new THREE.Vector3(...b);
-    for (let i = 0; i < 7; i++) {
-      const p = av.clone().lerp(bv, i / 6);
-      const o = cyl(g, r * 1.14, 0.033, p.toArray(), m.steel);
-      o.quaternion.setFromUnitVectors(
-        new THREE.Vector3(0, 1, 0),
-        bv.clone().sub(av).normalize(),
-      );
-    }
-  }
-  function bolt(g, pos) {
-    cyl(g, 0.022, 0.024, pos, m.chrome, "z", 0.022, 6);
-  }
   function vents(g, pos, w, h, count = 7) {
     box(g, [w, h, 0.04], pos, m.black);
     for (let i = 0; i < count; i++)
@@ -395,8 +387,6 @@ export function createGeometryKit({ root, parts, materials, seed = 72007 }) {
     rod,
     plate,
     joint,
-    ribbed,
-    bolt,
     vents,
     wheel,
     rig,

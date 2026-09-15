@@ -6,11 +6,11 @@
     <meta name="theme-color" content="#101b28" />
     <meta
       name="description"
-      content="An interactive Optimus Prime transformation study. Explore a detailed 3D robot and scrub its transformation into a movie-inspired long-nose semi truck."
+      content="An interactive Bumblebee transformation study. Explore a detailed 3D scout robot and scrub its transformation into a movie-inspired muscle coupe."
     />
-    <title>Form Foundry — Optimus Prime</title>
+    <title>Form Foundry — Bumblebee</title>
   </head>
-  <body>
+  <body data-model="bumblebee">
     <div id="app">
       <header>
         <a class="brand" href="./" aria-label="Form Foundry home"
@@ -18,25 +18,25 @@
           <span class="studio">/ Interactive 3D collection</span></a
         >
         <nav class="editions" aria-label="Collection">
-          <a href="./" aria-current="page">001 — Optimus Prime</a
-          ><a href="./bumblebee.html">002 — Bumblebee</a>
+          <a href="./">001 — Optimus Prime</a
+          ><a href="./bumblebee.html" aria-current="page">002 — Bumblebee</a>
         </nav>
       </header>
       <main>
         <div class="intro">
           <p class="eyebrow"><span></span> Transformers / Movie collection</p>
-          <h1>OPTIMUS<br /><em>PRIME.</em></h1>
+          <h1>BUMBLE<br /><em>BEE.</em></h1>
           <p class="description">
-            Freedom is the right<br />of all sentient beings.
+            The radio speaks<br />when the scout will not.
           </p>
           <div class="spec">
             <span>Allegiance</span><strong>Autobot</strong
-            ><span>Alternate form</span><strong>Peterbilt 379</strong
+            ><span>Alternate form</span><strong>Chevrolet Camaro</strong
             ><span>Design era</span><strong>2007–2011 / Cinema</strong>
           </div>
         </div>
-        <div id="viewport" aria-label="Interactive 3D model of Optimus Prime">
-          <div id="loading">Assembling Prime<span></span></div>
+        <div id="viewport" aria-label="Interactive 3D model of Bumblebee">
+          <div id="loading">Assembling the scout<span></span></div>
         </div>
         <aside class="view-tools" aria-label="Model controls">
           <button id="reset" title="Reset camera" aria-label="Reset camera">
@@ -92,7 +92,7 @@
             value="30"
             aria-label="Finger grip"
           />
-          <p>Open armor to reveal the moving mechanisms.</p>
+          <p>Run systems to light the chest radio array.</p>
         </section>
         <div class="model-caption">
           <span class="status-dot"></span><span id="mode">Robot mode</span
@@ -102,7 +102,7 @@
           <div class="panel-heading">
             <div>
               <span class="tiny">Transformation sequence</span>
-              <h2 id="phase">Ready to roll out.</h2>
+              <h2 id="phase">Standing by.</h2>
             </div>
             <button id="play">
               <span id="play-icon">▶</span
@@ -118,7 +118,7 @@
               max="1000"
               value="0"
               aria-label="Transformation progress"
-            /><span class="endpoint">Truck</span
+            /><span class="endpoint">Coupe</span
             ><output id="progress" for="transform">0<span>%</span></output>
           </div>
           <div class="sequence">
@@ -133,10 +133,10 @@
         <span>Explore form. Discover the machinery.</span
         ><span
           >Independent fan-made 3D study
-          <span class="footer-dot">/</span> Optimus Prime © Hasbro</span
+          <span class="footer-dot">/</span> Bumblebee © Hasbro</span
         ><span class="live">Real-time 3D <i></i></span>
       </footer>
     </div>
-    <script type="module" src="/src/main.js"></script>
+    <script type="module" src="/src/bee-main.js"></script>
   </body>
 </html>

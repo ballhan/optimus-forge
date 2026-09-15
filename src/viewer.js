@@ -182,7 +182,8 @@ export function createViewer({ build, framing, copy }) {
     );
     if (!detail) {
       const height =
-        framing.robotTarget - framing.vehicleDrop * THREE.MathUtils.smoothstep(t, 0.4, 1);
+        framing.robotTarget -
+        framing.vehicleDrop * THREE.MathUtils.smoothstep(t, 0.4, 1);
       camera.position.y += height - controls.target.y;
       controls.target.y = height;
     }
@@ -197,7 +198,11 @@ export function createViewer({ build, framing, copy }) {
       .querySelectorAll("[data-stage]")
       .forEach((el, i) => el.classList.toggle("active", i === stage));
     document.querySelector("#phase").textContent =
-      target === 0 ? copy.ready : target === 1 ? copy.complete : copy.stages[stage];
+      target === 0
+        ? copy.ready
+        : target === 1
+          ? copy.complete
+          : copy.stages[stage];
     document.querySelector("#mode").textContent =
       target === 0
         ? "Robot mode"
@@ -358,7 +363,37 @@ export function createViewer({ build, framing, copy }) {
   }
   requestAnimationFrame(animate);
   // Read-only diagnostics used to verify each assembled endpoint and the animation.
+  const measure = new THREE.Box3();
   window.study = {
+    // World-space extent of each assembly's own geometry, excluding the
+    // assemblies parented to it, for checking silhouettes and overlap.
+    bounds() {
+      const rigged = new Set(model.parts.map((p) => p.g));
+      const point = new THREE.Vector3();
+      return model.parts.map((p) => {
+        measure.makeEmpty();
+        p.g.updateWorldMatrix(true, true);
+        const walk = (o) => {
+          if (o !== p.g && rigged.has(o)) return;
+          if (o.isMesh) {
+            const position = o.geometry.attributes.position;
+            for (let i = 0; i < position.count; i++)
+              measure.expandByPoint(
+                point
+                  .fromBufferAttribute(position, i)
+                  .applyMatrix4(o.matrixWorld),
+              );
+          }
+          o.children.forEach(walk);
+        };
+        walk(p.g);
+        return {
+          name: p.g.name,
+          min: measure.min.toArray(),
+          max: measure.max.toArray(),
+        };
+      });
+    },
     get state() {
       return {
         target,
