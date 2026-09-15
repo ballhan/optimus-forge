@@ -8,16 +8,16 @@ test("armor hinges, articulated grip, and live systems work in both modes", asyn
   await page.setViewportSize({ width: 1440, height: 1000 });
   await page.goto(process.env.STUDY_URL || "http://127.0.0.1:5173");
   await page.waitForFunction(
-    () => window.primeStudy?.state.fingerJoints === 30,
+    () => window.study?.state.fingerJoints === 30,
   );
-  expect(await page.evaluate(() => window.primeStudy.state.armorHinges)).toBe(
+  expect(await page.evaluate(() => window.study.state.armorHinges)).toBe(
     14,
   );
   await page.locator("#armor").fill("100");
   await page.locator("#grip").fill("100");
   await page.waitForFunction(
     () =>
-      window.primeStudy.state.armor === 1 && window.primeStudy.state.grip === 1,
+      window.study.state.armor === 1 && window.study.state.grip === 1,
   );
   await page.screenshot({ path: "artifacts/mechanisms-open.png" });
   await page.locator("#systems").click();
@@ -26,27 +26,27 @@ test("armor hinges, articulated grip, and live systems work in both modes", asyn
     "true",
   );
   const frames = await page.evaluate(
-    () => window.primeStudy.state.renderedFrames,
+    () => window.study.state.renderedFrames,
   );
   await page.waitForFunction(
-    (n) => window.primeStudy.state.renderedFrames > n + 8,
+    (n) => window.study.state.renderedFrames > n + 8,
     frames,
   );
   await page.locator("#systems").click();
   const pausedPhase = await page.evaluate(
-    () => window.primeStudy.state.rotorPhase,
+    () => window.study.state.rotorPhase,
   );
   await page.locator("#grip").fill("0");
-  await page.waitForFunction(() => window.primeStudy.state.grip === 0);
-  expect(await page.evaluate(() => window.primeStudy.state.rotorPhase)).toBe(
+  await page.waitForFunction(() => window.study.state.grip === 0);
+  expect(await page.evaluate(() => window.study.state.rotorPhase)).toBe(
     pausedPhase,
   );
   await page.screenshot({ path: "artifacts/mechanisms-hand-open.png" });
   await page.locator("#transform").fill("1000");
-  await page.waitForFunction(() => window.primeStudy.state.progress === 1);
+  await page.waitForFunction(() => window.study.state.progress === 1);
   await page.screenshot({ path: "artifacts/mechanisms-truck.png" });
   await page.locator("#transform").fill("0");
-  await page.waitForFunction(() => window.primeStudy.state.progress === 0);
+  await page.waitForFunction(() => window.study.state.progress === 0);
   await page.setViewportSize({ width: 390, height: 844 });
   await page.screenshot({
     path: "artifacts/mechanisms-mobile.png",

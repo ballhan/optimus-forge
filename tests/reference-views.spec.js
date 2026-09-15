@@ -15,7 +15,7 @@ test("inspect head and back without disrupting transformation", async ({
   await page.mouse.down();
   await page.mouse.move(1310, 430, { steps: 12 });
   await page.mouse.up();
-  await page.waitForFunction(() => !window.primeStudy.state.cameraMoving);
+  await page.waitForFunction(() => !window.study.state.cameraMoving);
   await page.screenshot({ path: "artifacts/back.png" });
   await page.getByRole("button", { name: "Inspect upper body" }).click();
   await page.locator("#transform").fill("1000");
@@ -23,6 +23,6 @@ test("inspect head and back without disrupting transformation", async ({
     "aria-pressed",
     "false",
   );
-  await page.waitForFunction(() => window.primeStudy.state.progress === 1);
+  await page.waitForFunction(() => window.study.state.progress === 1);
   await expect(page.locator("#mode")).toHaveText("Vehicle mode");
 });
